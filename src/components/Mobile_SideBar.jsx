@@ -44,7 +44,7 @@ export default function Mobile_SideBar() {
     }
 
     return (
-        <div id="mobile-sidebar" className={showSideBar ? "absolute top-10 left-0 sm:hidden flex flex-col w-screen h-3/4 bg-white opacity-90 px-8" : "hidden"}>
+        <div id="mobile-sidebar" className={showSideBar ? "absolute top-10 left-0 sm:hidden flex flex-col w-screen h-screen bg-white opacity-90 px-8" : "hidden"}>
             <div className="basis-1/6 flex flex-row items-center justify-end">
                 <FaTimes size={24} color="#000" onClick={handleSideBar}/>
             </div>
