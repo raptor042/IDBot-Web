@@ -2,7 +2,6 @@
 
 import { useWeb3Modal } from "@web3modal/wagmi/react"
 import { useEffect, useState } from "react"
-import { FaWallet } from "react-icons/fa"
 import { useAccount } from "wagmi"
 
 export default function ConnectWallet() {
@@ -28,13 +27,12 @@ export default function ConnectWallet() {
     }
 
     return (
-        <div id="connect-wallet" className="absolute top-20 right-20">
-            <button onClick={() => open()} className="p-4 text-bold text-lg text-white flex rounded-lg" style={{ backgroundColor : "#101530" }}>
+        <div id="connect-wallet" className="hidden sm:block">
+            <button onClick={() => open()} className="p-4 text-bold text-lg text-white flex rounded-lg bg-black">
                 { isConnected ?
                     account :
                     <>
-                        Connect
-                        <FaWallet size={24} color="#ffffff" className="ml-4"/>
+                        Connect Wallet
                     </>
                 }
             </button>

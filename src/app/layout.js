@@ -1,6 +1,7 @@
 import { Web3Modal } from '@/context/Web3Modal'
 import './globals.css'
 import { Nunito } from "next/font/google"
+import { StateProvider } from '@/store'
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -17,7 +18,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body style={{ fontFamily : nunito.style.fontFamily }}>
-        <Web3Modal>{children}</Web3Modal>
+        <StateProvider>
+          <Web3Modal>{children}</Web3Modal>
+        </StateProvider>
       </body>
     </html>
   )

@@ -1,10 +1,10 @@
 import Image from "next/image"
-import idbot from "../../public/idbot.png"
+import idbot from "../../public/idbot.jpg"
 
 export default function Logo() {
     return (
-        <div id="logo" className="absolute top-20 left-20">
-            <Image src={idbot} width={120} height={60}/>
+        <div id="logo" className="">
+            <Image src={idbot} alt="IDBot Protocol Logo" className="w-32 h-16 sm:w-48 sm:h-24"/>
         </div>
     )
 }
