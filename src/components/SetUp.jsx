@@ -152,7 +152,7 @@ export default function SetUp() {
             set_dev(true)
         } else if(_dev && dev) {
             if(address && isConnected) {
-                handleSubmit()
+                // handleSubmit()
                 set_dev(false)
                 setDone(true)
             } else {
