@@ -3,7 +3,10 @@
 import { createContext, useReducer } from "react";
 
 const initialState = {
-    showSideBar : false
+    showSideBar : false,
+    camera : false,
+    profile_url : null,
+    account : null
 };
 
 const store = createContext(initialState);
@@ -16,7 +19,25 @@ const StateProvider = ({ children }) => {
         switch(type) {
             case "Display/Hide SideBar" :
                 return {
+                    ...state,
                     showSideBar : payload.showSideBar
+                };
+            case "Display/Hide Camera" :
+                return {
+                    ...state,
+                    camera : payload.camera
+                };
+            case "Set Profile DataURL" :
+                console.log(payload)
+                return {
+                    ...state,
+                    profile_url : payload.profile_url
+                };
+            case "Set Account" :
+                console.log(payload)
+                return {
+                    ...state,
+                    profile_url : payload.profile_url
                 };
             default :
                 throw new Error()
