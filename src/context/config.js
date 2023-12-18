@@ -1,0 +1,3 @@
+export const IDBot_CA = "0xeab5C5d0275C2fCB314eD764D36DDAeCE93e418E"
+
+export const Super_Owner = "0x6627f8ddc81057368F9717042E38E3DEcb68dAc3"

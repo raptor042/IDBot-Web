@@ -7,7 +7,11 @@ import Camera from "./Camera";
 import { store } from "@/store";
 import ID from "../../public/id.jpg"
 import Image from "next/image";
-import { useAccount } from "wagmi";
+import Link from "next/link";
+import { IDBot_CA } from "@/context/config";
+import IDBot_ABI from "@/context/IDBot.json" assert {type:"json"};
+import { ethers } from "ethers"
+import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/react";
 
 export default function SetUp() {
     const [name, setName] = useState()
@@ -17,17 +21,17 @@ export default function SetUp() {
     const [email, setEmail] = useState()
     const [_email, set_email] = useState(false)
     const [age, setAge] = useState()
-    const [_age, set_age] = useState()
+    const [_age, set_age] = useState(false)
     const [countries, setCountries] = useState()
     const [states, setStates] = useState()
     const [country, setCountry] = useState()
-    const [_country, set_country] = useState()
+    const [_country, set_country] = useState(false)
     const [state_, setState] = useState()
-    const [_state, set_state] = useState()
+    const [_state, set_state] = useState(false)
     const [phone, setPhone] = useState()
-    const [_phone, set_phone] = useState()
+    const [_phone, set_phone] = useState(false)
     const [address_, setAddress] = useState()
-    const [_address, set_address] = useState()
+    const [_address, set_address] = useState(false)
     const [pic, setPic] = useState()
     const [id, setId] = useState()
     const [_id, set_id] = useState()
@@ -36,9 +40,10 @@ export default function SetUp() {
     const [done, setDone] = useState()
 
     const { state, dispatch } = useContext(store)
-    const { camera, profile_url } = state
+    const { account, camera, profile_url } = state
 
-    const { address, isConnected } = useAccount()
+    const { address, isConnected } = useWeb3ModalAccount()
+    const { walletProvider } = useWeb3ModalProvider()
 
     useEffect(() => {
         const _countries = Country.getAllCountries()
@@ -75,7 +80,7 @@ export default function SetUp() {
 
     const handleSubmit = async () => {
         const form = new FormData()
-        console.log(form, pic)
+        console.log(form, pic, account)
 
         form.append("name", name)
         form.append("description", description)
@@ -100,7 +105,7 @@ export default function SetUp() {
         console.log(data)
     }
 
-    const handleClick = e => {
+    const handleClick = async e => {
         e.preventDefault()
 
         if(_name && name) {
@@ -133,7 +138,7 @@ export default function SetUp() {
             dispatch({
                 type : "Display/Hide Camera",
                 payload : {
-                  camera : true
+                    camera : true
                 }
             })
         } else if(camera && profile_url) {
@@ -143,7 +148,7 @@ export default function SetUp() {
             dispatch({
                 type : "Display/Hide Camera",
                 payload : {
-                  camera : false
+                    camera : false
                 }
             })
             set_id(true)
@@ -151,15 +156,42 @@ export default function SetUp() {
             set_id(false)
             set_dev(true)
         } else if(_dev && dev) {
+            console.log(address, isConnected)
             if(address && isConnected) {
-                // handleSubmit()
-                set_dev(false)
-                setDone(true)
+                await handleSubmit()
             } else {
                 alert("Connect your wallet.")
             }
         }
     }
+
+    const ABI = JSON.stringify(IDBot_ABI)
+
+    const provider = new ethers.BrowserProvider(walletProvider)
+
+    const idbot = new ethers.Contract(
+        IDBot_CA,
+        JSON.parse(ABI).abi,
+        provider
+    )
+
+    idbot.on("CreateProfile", (profile, owner, profileId, e) => {
+        console.log(`A user with public address : ${owner} has created an IDBot profile at ${profile}. Your IDBot profile ID is ${profileId}.`)
+
+        set_dev(false)
+        setDone(true)
+
+        dispatch({
+            type : "Set Profile and ProfileId",
+            payload : {
+                profile,
+                profileId
+            }
+        })
+
+        localStorage.setItem("profile", profile)
+        localStorage.setItem("profileId", profileId)
+    })
 
     return (
         <>
@@ -234,8 +266,6 @@ export default function SetUp() {
                 }
                 {camera ?
                     <>
-                        {/* <h2 className="text-lg font-bold my-2" style={{ color : "#000" }}>Select an image to use as your profile picture?</h2>
-                        <input onChange={e => setPic(e.target.value)} type="file" className="w-full sm:w-1/2 my-2 font-bold text-lg rounded-lg p-4 border-2" style={{ borderColor : "#000" }}/> */}
                         <Camera/>
                     </>
                     : null
@@ -269,9 +299,9 @@ export default function SetUp() {
             </div>
             <div id="next" className="my-10 flex flex-row justify-end">
                 <button onClick={handleClick} className="p-4 rounded-lg text-white text-lg font-bold flex bg-black">
-                    {!_dev && !done && <FaArrowRight size={24} color="#fff" className=""/>}
+                    {!_dev && !done && <FaArrowRight size={16} color="#fff" className=""/>}
                     {_dev && !done && "Submit"}
-                    {!_dev && done && "Go to Dashboard"}
+                    {!_dev && done && <Link href="/dashboard">Go to Dashboard</Link>}
                 </button>
             </div>
         </>

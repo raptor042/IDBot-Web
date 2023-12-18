@@ -4,8 +4,7 @@ import Link from "next/link";
 import { FaTimes } from "react-icons/fa";
 import { useContext, useState, useEffect } from "react";
 import { store } from "@/store";
-import { useAccount } from "wagmi";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { useWeb3Modal, useWeb3ModalAccount } from "@web3modal/ethers/react";
 
 export default function Mobile_SideBar() {
     const { state, dispatch } = useContext(store)
@@ -13,7 +12,7 @@ export default function Mobile_SideBar() {
 
     const [account, setAccount] = useState()
 
-    const { address, isConnected } = useAccount()
+    const { address, isConnected } = useWeb3ModalAccount()
 
     const { open } = useWeb3Modal()
 
@@ -56,10 +55,13 @@ export default function Mobile_SideBar() {
                     <Link href="/dashboard">Dashboard</Link>
                 </h2>
                 <h2 className="my-4 font-bold text-xl text-black">
-                    <Link href="/config">Configuration</Link>
+                    <Link href="/setup">Configuration</Link>
                 </h2>
                 <h2 className="my-4 font-bold text-xl text-black">
-                    <Link href="/share">Share</Link>
+                    <Link href="/subscription">Subscription</Link>
+                </h2>
+                <h2 className="my-4 font-bold text-xl text-black">
+                    <Link href="/search">Search Profiles/Projects</Link>
                 </h2>
             </div>
             <div className="basis-2/6 flex flex-row justify-center items-center">

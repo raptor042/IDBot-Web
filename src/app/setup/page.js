@@ -38,7 +38,7 @@ export default function SetUpPage() {
                     <ConnectWallet/>
                 </div>
                 <div className="basis-4/5 sm:basis-2/3 px-8 sm:px-16">
-                    <Heading/>
+                    <Heading slug="Lets set-up and configure your IDBot identity"/>
                     <SetUp/>
                 </div>
             </div>

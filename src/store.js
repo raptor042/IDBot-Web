@@ -6,7 +6,9 @@ const initialState = {
     showSideBar : false,
     camera : false,
     profile_url : null,
-    account : null
+    account : null,
+    profile : null,
+    profileId : null
 };
 
 const store = createContext(initialState);
@@ -34,10 +36,16 @@ const StateProvider = ({ children }) => {
                     profile_url : payload.profile_url
                 };
             case "Set Account" :
-                console.log(payload)
                 return {
                     ...state,
                     profile_url : payload.profile_url
+                };
+            case "Set Profile and ProfileId" :
+                console.log(payload)
+                return {
+                    ...state,
+                    profile : payload.profile,
+                    profileId : payload.profileId
                 };
             default :
                 throw new Error()

@@ -1,22 +1,36 @@
 "use client"
 
-import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react"
-
-import { WagmiConfig } from "wagmi"
-import { mainnet, goerli } from "viem/chains"
+import { createWeb3Modal, defaultConfig } from "@web3modal/ethers/react"
 
 const projectId = "9c8d0b18b525316d4e07dc49ef35e08c"
 
-const metadata = {
-    name : "IDBot",
-    description : "IDbot is The Decentralized Identity Verification Protocol aims to establish a secure, privacy-focused system for identity verification within blockchain applications."
+const mainnet = {
+    chainId: 1,
+    name: "Ethereum",
+    currency: "ETH",
+    explorerUrl: "https://etherscan.io",
+    rpcUrl: "https://mainnet.infura.io/v3/0253203d40d344978948e4641ac65adb"
 }
 
-const chains = [mainnet, goerli]
-const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata })
+const sepolia = {
+    chainId: 11155111,
+    name: "Sepolia Testnet",
+    currency: "SepoliaETH",
+    explorerUrl: "https://sepolia.etherscan.io",
+    rpcUrl: "https://sepolia.infura.io/v3/0253203d40d344978948e4641ac65adb"
+}
 
-createWeb3Modal({ wagmiConfig, projectId, chains })
+const metadata = {
+    name : "IDBot",
+    description : "IDBot is The Decentralized Identity Verification Protocol aims to establish a secure, privacy-focused system for identity verification within blockchain applications."
+}
 
-export function Web3Modal({ children }) {
-    return <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>
+createWeb3Modal({
+    ethersConfig: defaultConfig({ metadata }),
+    projectId,
+    chains: [sepolia]
+})
+
+export function Web3ModalProvider({ children }) {
+    return children
 }

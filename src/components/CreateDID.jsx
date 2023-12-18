@@ -1,14 +1,10 @@
-"use client"
-
-import { useRouter } from "next/navigation"
+import Link from "next/link";
 
 export default function CreateDID() {
-    const router = useRouter()
-
     return (
         <div id="create-did" className="">
-            <button onClick={() => window.location.assign("https://id-bot-benjamin1234-ben.vercel.app/setup")} className="p-4 text-bold text-lg text-white flex rounded-lg bg-black">
-                Begin Set-up
+            <button className="p-4 text-bold text-lg text-white flex rounded-lg bg-black">
+                <Link href="/setup">Begin Set-up</Link>
             </button>
         </div>
     )

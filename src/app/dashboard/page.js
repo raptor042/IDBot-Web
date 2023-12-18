@@ -1,16 +1,16 @@
 "use client"
 
 import ConnectWallet from "@/components/ConnectWallet";
+import Dashboard from "@/components/Dashboard";
 import Heading from "@/components/Heading";
 import Logo from "@/components/Logo";
 import Mobile_SideBar from "@/components/Mobile_SideBar";
-import SetUp from "@/components/SetUp";
 import SideBar from "@/components/SideBar";
 import { store } from "@/store";
 import { useContext } from "react";
 import { FaBars } from "react-icons/fa";
 
-export default function SetUpPage() {
+export default function DashboardPage() {
     const { state, dispatch } = useContext(store)
     const { showSideBar } = state
 
@@ -26,7 +26,7 @@ export default function SetUpPage() {
     }
 
     return (
-        <div id="setup" className="relative w-screen h-screen flex flex-row">
+        <div id="dashboard" className="relative w-screen h-screen flex flex-row">
             <SideBar/>
             <Mobile_SideBar/>
             <div className="sm:w-full md:w-11/12 h-full flex flex-col">
@@ -38,8 +38,8 @@ export default function SetUpPage() {
                     <ConnectWallet/>
                 </div>
                 <div className="basis-4/5 sm:basis-2/3 px-8 sm:px-16">
-                    <Heading/>
-                    
+                    <Heading slug="Lets set-up and configure your IDBot identity"/>
+                    <Dashboard/>
                 </div>
             </div>
         </div>

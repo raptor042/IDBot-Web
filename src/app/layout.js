@@ -1,4 +1,4 @@
-import { Web3Modal } from '@/context/Web3Modal'
+import { Web3ModalProvider } from '@/context/Web3Modal'
 import './globals.css'
 import { Nunito } from "next/font/google"
 import { StateProvider } from '@/store'
@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body style={{ fontFamily : nunito.style.fontFamily }}>
         <StateProvider>
-          <Web3Modal>{children}</Web3Modal>
+          <Web3ModalProvider>{children}</Web3ModalProvider>
         </StateProvider>
       </body>
     </html>

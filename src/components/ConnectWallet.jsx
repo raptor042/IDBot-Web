@@ -1,12 +1,11 @@
 "use client"
 
 import { store } from "@/store"
-import { useWeb3Modal } from "@web3modal/wagmi/react"
+import { useWeb3Modal, useWeb3ModalAccount } from "@web3modal/ethers/react"
 import { useContext, useEffect, useState } from "react"
-import { useAccount } from "wagmi"
 
 export default function ConnectWallet() {
-    const { address, isConnected } = useAccount()
+    const { address, isConnected } = useWeb3ModalAccount()
 
     const { open } = useWeb3Modal()
 
@@ -19,10 +18,11 @@ export default function ConnectWallet() {
             const _address = truncate(address)
 
             setAccount(_address)
+            
             dispatch({
                 type : "Set Account",
                 payload : {
-                    account : _address
+                    account : address
                 }
             })
         }
