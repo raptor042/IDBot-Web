@@ -9,7 +9,7 @@ import Profile_ABI from "@/context/Profile.json" assert {type:"json"};
 import { ethers } from "ethers"
 import Link from "next/link"
 
-export default function ProfileInfo({ profile }) {
+export default function ProfileInfo({ profile, admin }) {
     const [display, setDisplay] = useState(false)
     const [previous, setPrevious] = useState(false)
     const [next, setNext] = useState(true)
@@ -49,8 +49,6 @@ export default function ProfileInfo({ profile }) {
 
     const provider = new ethers.BrowserProvider(walletProvider)
 
-    console.log(profile)
-
     useEffect(() => {
         const contract = async () => {
             const idbot_profile = new ethers.Contract(
@@ -66,10 +64,10 @@ export default function ProfileInfo({ profile }) {
     })
 
     const getProfileId = async () => {
-        const projectId = await idbot_profile.getProjectId()
-        console.log(projectId)
+        const profileId = await idbot_profile.getIDBotNumber()
+        console.log(ethers.toBigInt(profileId))
 
-        return projectId
+        return ethers.toBigInt(profileId)
     }
 
     const getName = async () => {
@@ -95,9 +93,9 @@ export default function ProfileInfo({ profile }) {
 
     const getAge = async () => {
         const age = await idbot_profile.getAge()
-        console.log(ethers.formatUnits(age))
+        console.log(age)
 
-        return ethers.formatUnits(age)
+        return age
     }
 
     const getCountry = async () => {
@@ -137,9 +135,9 @@ export default function ProfileInfo({ profile }) {
 
     const getScore = async () => {
         const score = await idbot_profile.getReputationScore()
-        console.log(ethers.formatUnits(score))
+        console.log(ethers.toBigInt(score))
 
-        return ethers.formatUnits(score)
+        return ethers.toBigInt(score)
     }
 
     const getProjects = async () => {
@@ -159,8 +157,8 @@ export default function ProfileInfo({ profile }) {
             set_ProfileId(true)
             setPrevious(true)
 
-            //const profileId = await getProfileId()
-            setProfileId("00000")
+            const profileId = await getProfileId()
+            setProfileId(profileId)
         } else if(_profileId) {
             set_ProfileId(false)
             set_name(true)

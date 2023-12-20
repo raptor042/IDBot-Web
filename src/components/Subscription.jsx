@@ -47,7 +47,6 @@ export default function Subscription() {
         console.log(sub.split(","), idbot)
 
         const subscribe = await idbot.subscribe(
-            address,
             Number(sub.split(",")[0]),
             {
                 value : ethers.parseEther(`${sub.split(",")[1]}`)

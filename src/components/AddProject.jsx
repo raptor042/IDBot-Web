@@ -56,7 +56,7 @@ export default function AddProject() {
         }
 
         contract()
-    }, [])
+    })
 
     const handleSubmit = async () => {
         const project = await idbot_profile.addProject(
@@ -73,6 +73,9 @@ export default function AddProject() {
 
         idbot_profile.on("AddProject", (ca, name, e) => {
             console.log(`You have added ${name} at ${ca} to your project list.`)
+        
+            set_linktree(false)
+            setDone(true)
         })
     }
 
@@ -104,9 +107,7 @@ export default function AddProject() {
             set_discord(false)
             set_linktree(true)
         } else if(_linktree && linktree) {
-            set_linktree(false)
             console.log(address, isConnected)
-            setDone(true)
             if(address && isConnected) {
                 await handleSubmit()
             } else {

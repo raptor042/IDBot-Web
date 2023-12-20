@@ -1,18 +1,47 @@
 "use client"
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProfileInfo from "./ProfileInfo";
+import { IDBot_CA } from "@/context/config";
+import IDBot_ABI from "@/context/IDBot.json" assert {type:"json"};
 
 export default function Search() {
     const [profile, setProfile] = useState()
     const [_profile, set_profile] = useState(true)
     const [profile_info, setProfileInfo] = useState(false)
+    const [idbot, setIDBot] = useState()
+
+    const { address, isConnected } = useWeb3ModalAccount()
+    const { walletProvider } = useWeb3ModalProvider()
+
+    const ABI = JSON.stringify(IDBot_ABI)
+
+    const provider = new ethers.BrowserProvider(walletProvider)
+
+    useEffect(() => {
+        const contract = async () => {
+            const idbot = new ethers.Contract(
+                IDBot_CA,
+                JSON.parse(ABI).abi,
+                await provider.getSigner()
+            )
+
+            setIDBot(idbot)
+        }
+
+        contract()
+    })
 
     const handleProfile = async e => {
         e.preventDefault()
 
-        set_profile(false)
-        setProfileInfo(true)
+        const isSubscribed = await idbot.isSubscribed(address)
+        console.log(isSubscribed)
+
+        if(isSubscribed) {
+            set_profile(false)
+            setProfileInfo(true)
+        }
     }
 
     return (

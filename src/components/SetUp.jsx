@@ -38,6 +38,7 @@ export default function SetUp() {
     const [dev, setDev] = useState()
     const [_dev, set_dev] = useState()
     const [done, setDone] = useState()
+    const [loading, setLoading] = useState(false)
 
     const { state, dispatch } = useContext(store)
     const { account, camera, profile_url } = state
@@ -156,6 +157,7 @@ export default function SetUp() {
             set_id(false)
             set_dev(true)
         } else if(_dev && dev) {
+            setLoading(true)
             console.log(address, isConnected)
             if(address && isConnected) {
                 await handleSubmit()
@@ -300,7 +302,8 @@ export default function SetUp() {
             <div id="next" className="my-10 flex flex-row justify-end">
                 <button onClick={handleClick} className="p-4 rounded-lg text-white text-lg font-bold flex bg-black">
                     {!_dev && !done && <FaArrowRight size={16} color="#fff" className=""/>}
-                    {_dev && !done && "Submit"}
+                    {_dev && !done && !loading && "Submit"}
+                    {_dev && !done && loading && <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24"></svg>}
                     {!_dev && done && <Link href="/dashboard">Go to Dashboard</Link>}
                 </button>
             </div>
