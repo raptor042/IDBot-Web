@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import ProfileInfo from "./ProfileInfo";
 import { IDBot_CA } from "@/context/config";
 import IDBot_ABI from "@/context/IDBot.json" assert {type:"json"};
+import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/react";
+import { ethers } from "ethers";
 
 export default function Search() {
     const [profile, setProfile] = useState()
@@ -47,7 +49,7 @@ export default function Search() {
     return (
         <>
             <div className="sm:px-10 my-10">
-                { profile_info && <ProfileInfo profile={profile}/> }
+                { profile_info && <ProfileInfo profile={profile} admin={false}/> }
                 {_profile ? 
                     <>
                         <h2 className="text-lg font-bold my-2" style={{ color : "#000" }}>Search for a Profile by address or IDBot number</h2>

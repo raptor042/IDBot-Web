@@ -52,7 +52,7 @@ export default function Admin() {
             address : address
         }
 
-        const response = await fetch("http://localhost:8000/login", {
+        const response = await fetch("https://idbot-80bt.onrender.com/login", {
             method : "POST",
             headers : {
                 "Content-Type" : "application/json"
@@ -121,7 +121,7 @@ export default function Admin() {
                         </div>
                     </div>
                 }
-                {_profile && <ProfileInfo profile={profile}/>}
+                {_profile && <ProfileInfo profile={profile} admin={true}/>}
             </div>
         </>
     )

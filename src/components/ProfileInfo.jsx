@@ -65,9 +65,9 @@ export default function ProfileInfo({ profile, admin }) {
 
     const getProfileId = async () => {
         const profileId = await idbot_profile.getIDBotNumber()
-        console.log(ethers.toBigInt(profileId))
+        console.log(Number(ethers.toBigInt(profileId)))
 
-        return ethers.toBigInt(profileId)
+        return Number(ethers.toBigInt(profileId))
     }
 
     const getName = async () => {
@@ -135,9 +135,9 @@ export default function ProfileInfo({ profile, admin }) {
 
     const getScore = async () => {
         const score = await idbot_profile.getReputationScore()
-        console.log(ethers.toBigInt(score))
+        console.log(Number(ethers.toBigInt(score)))
 
-        return ethers.toBigInt(score)
+        return Number(ethers.toBigInt(score))
     }
 
     const getProjects = async () => {
@@ -224,7 +224,7 @@ export default function ProfileInfo({ profile, admin }) {
             set_projects(true)
 
             const projects = await getProjects()
-            //setProjects(projects)
+            setProjects(projects)
             setNext(false)
         }
     }
@@ -274,6 +274,23 @@ export default function ProfileInfo({ profile, admin }) {
             setPrevious(false)
         }
     }
+
+    const handleVerify = async e => {
+        e.preventDefault()
+
+        const response = await fetch(`https://idbot-80bt.onrender.com/verify/${profile}`, {
+            method : "GET",
+        })
+    }
+
+    const handleUnverify = async e => {
+        e.preventDefault()
+
+        const response = await fetch(`https://idbot-80bt.onrender.com/unverify/${profile}`, {
+            method : "GET",
+        })
+    }
+
 
     return (
         <div id="profile-info" className="sm:px-10 my-10">
@@ -492,6 +509,16 @@ export default function ProfileInfo({ profile, admin }) {
                         }
                     </select>
                 </>
+            }
+            {admin &&
+                <div className="flex flex-row items-center justify-around">
+                    <button onClick={handleVerify} className="p-4 rounded-lg text-white text-lg font-bold bg-black">
+                        Verify Profile
+                    </button>
+                    <button onClick={handleUnverify} className="p-4 rounded-lg text-white text-lg font-bold bg-black">
+                        Remove Verification
+                    </button>
+                </div>
             }
             <div className="flex flex-row items-center justify-between my-10">
                 <button onClick={handlePrevious} className={previous ? "p-4 rounded-lg text-white text-lg font-bold bg-black" : "invisible"}>

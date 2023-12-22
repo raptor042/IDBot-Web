@@ -134,9 +134,9 @@ export default function Dashboard() {
 
     const getScore = async () => {
         const score = await idbot_profile.getReputationScore()
-        console.log(ethers.formatUnits(score))
+        console.log(Number(ethers.toBigInt(score)))
 
-        return ethers.formatUnits(score)
+        return Number(ethers.toBigInt(score))
     }
 
     const getProjects = async () => {
@@ -217,7 +217,7 @@ export default function Dashboard() {
             set_projects(true)
 
             const projects = await getProjects()
-            //setProjects(projects)
+            setProjects(projects)
             setNext(false)
         }
     }
