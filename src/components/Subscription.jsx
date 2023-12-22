@@ -26,7 +26,7 @@ export default function Subscription() {
 
     const provider = new ethers.BrowserProvider(walletProvider)
 
-    const profileId = localStorage.getItem("profileId")
+    const profileId = window.localStorage.getItem("profileId")
   
     useEffect(() => {
         const contract = async () => {

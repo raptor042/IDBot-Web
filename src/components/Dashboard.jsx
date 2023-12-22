@@ -48,8 +48,8 @@ export default function Dashboard() {
 
     const provider = new ethers.BrowserProvider(walletProvider)
 
-    const profile = localStorage.getItem("profile")
-    const profileId = localStorage.getItem("profileId")
+    const profile = window.localStorage.getItem("profile")
+    const profileId = window.localStorage.getItem("profileId")
 
     useEffect(() => {
         const name = async () => {

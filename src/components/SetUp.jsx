@@ -38,6 +38,7 @@ export default function SetUp() {
     const [dev, setDev] = useState()
     const [_dev, set_dev] = useState()
     const [done, setDone] = useState()
+    const [idbot, setIDBot] = useState()
     const [loading, setLoading] = useState(false)
 
     const { state, dispatch } = useContext(store)
@@ -46,9 +47,20 @@ export default function SetUp() {
     const { address, isConnected } = useWeb3ModalAccount()
     const { walletProvider } = useWeb3ModalProvider()
 
+    const ABI = JSON.stringify(IDBot_ABI)
+
+    const provider = new ethers.BrowserProvider(walletProvider)
+
     useEffect(() => {
         const _countries = Country.getAllCountries()
         setCountries(_countries)
+
+        const idbot = new ethers.Contract(
+            IDBot_CA,
+            JSON.parse(ABI).abi,
+            provider
+        )
+        setIDBot(idbot)
     }, [])
 
     const dataURLToBlob = (dataURL, filename) => {
@@ -104,6 +116,24 @@ export default function SetUp() {
         })
         const data = await response.json()
         console.log(data)
+
+        idbot.on("CreateProfile", (profile, owner, profileId, e) => {
+            console.log(`A user with public address : ${owner} has created an IDBot profile at ${profile}. Your IDBot profile ID is ${profileId}.`)
+    
+            set_dev(false)
+            setDone(true)
+    
+            dispatch({
+                type : "Set Profile and ProfileId",
+                payload : {
+                    profile,
+                    profileId
+                }
+            })
+    
+            localStorage.setItem("profile", profile)
+            localStorage.setItem("profileId", profileId)
+        })
     }
 
     const handleClick = async e => {
@@ -166,34 +196,6 @@ export default function SetUp() {
             }
         }
     }
-
-    const ABI = JSON.stringify(IDBot_ABI)
-
-    const provider = new ethers.BrowserProvider(walletProvider)
-
-    const idbot = new ethers.Contract(
-        IDBot_CA,
-        JSON.parse(ABI).abi,
-        provider
-    )
-
-    idbot.on("CreateProfile", (profile, owner, profileId, e) => {
-        console.log(`A user with public address : ${owner} has created an IDBot profile at ${profile}. Your IDBot profile ID is ${profileId}.`)
-
-        set_dev(false)
-        setDone(true)
-
-        dispatch({
-            type : "Set Profile and ProfileId",
-            payload : {
-                profile,
-                profileId
-            }
-        })
-
-        localStorage.setItem("profile", profile)
-        localStorage.setItem("profileId", profileId)
-    })
 
     return (
         <>

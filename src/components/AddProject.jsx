@@ -42,7 +42,7 @@ export default function AddProject() {
 
     const provider = new ethers.BrowserProvider(walletProvider)
 
-    const profile = localStorage.getItem("profile")
+    const profile = window.localStorage.getItem("profile")
   
     useEffect(() => {
         const contract = async () => {
