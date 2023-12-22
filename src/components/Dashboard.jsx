@@ -38,8 +38,8 @@ export default function Dashboard() {
     const [projects, setProjects] = useState([])
     const [_projects, set_projects] = useState(false)
     const [idbot_profile, setIDBotProfile] = useState()
-
-    const { state, dispatch } = useContext(store)
+    const [profile, set_profile] = useState()
+    const [profileId, set_profileId] = useState()
 
     const { address, isConnected } = useWeb3ModalAccount()
     const { walletProvider } = useWeb3ModalProvider()
@@ -47,9 +47,6 @@ export default function Dashboard() {
     const ABI = JSON.stringify(Profile_ABI)
 
     const provider = new ethers.BrowserProvider(walletProvider)
-
-    const profile = window.localStorage.getItem("profile")
-    const profileId = window.localStorage.getItem("profileId")
 
     useEffect(() => {
         const name = async () => {
@@ -67,6 +64,12 @@ export default function Dashboard() {
         }
 
         name()
+
+        const profile = window.localStorage.getItem("profile")
+        const profileId = window.localStorage.getItem("profileId")
+
+        set_profile(profile)
+        set_profileId(profileId)
     })
 
     const getName = async () => {

@@ -2,8 +2,6 @@
 
 import { useContext, useEffect, useState } from "react";
 import { FaArrowRight } from "react-icons/fa";
-import { Country, State } from "country-state-city"
-import { store } from "@/store";
 import ID from "../../public/id.jpg"
 import Image from "next/image";
 import Link from "next/link";
@@ -32,8 +30,7 @@ export default function AddProject() {
     const [_linktree, set_linktree] = useState(false)
     const [done, setDone] = useState()
     const [idbot_profile, setIDBotProfile] = useState()
-
-    const { state, dispatch } = useContext(store)
+    const [profile, setProfile] = useState()
 
     const { address, isConnected } = useWeb3ModalAccount()
     const { walletProvider } = useWeb3ModalProvider()
@@ -41,8 +38,6 @@ export default function AddProject() {
     const ABI = JSON.stringify(Profile_ABI)
 
     const provider = new ethers.BrowserProvider(walletProvider)
-
-    const profile = window.localStorage.getItem("profile")
   
     useEffect(() => {
         const contract = async () => {
@@ -56,6 +51,9 @@ export default function AddProject() {
         }
 
         contract()
+
+        const profile = window.localStorage.getItem("profile")
+        setProfile(profile)
     })
 
     const handleSubmit = async () => {

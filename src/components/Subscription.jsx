@@ -16,8 +16,7 @@ export default function Subscription() {
     const [done, setDone] = useState(false)
     const [idbot, setIDBot] = useState()
     const [loading, setLoading] = useState(false)
-
-    const { state, dispatch } = useContext(store)
+    const [profileId, setProfileId] = useState()
 
     const { address, isConnected } = useWeb3ModalAccount()
     const { walletProvider } = useWeb3ModalProvider()
@@ -25,8 +24,6 @@ export default function Subscription() {
     const ABI = JSON.stringify(IDBot_ABI)
 
     const provider = new ethers.BrowserProvider(walletProvider)
-
-    const profileId = window.localStorage.getItem("profileId")
   
     useEffect(() => {
         const contract = async () => {
@@ -40,6 +37,9 @@ export default function Subscription() {
         }
 
         contract()
+
+        const profileId = window.localStorage.getItem("profileId")
+        setProfileId(profileId)
     })
 
     const handleClick = async e => {
