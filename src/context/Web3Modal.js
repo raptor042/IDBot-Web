@@ -28,7 +28,7 @@ const metadata = {
 createWeb3Modal({
     ethersConfig: defaultConfig({ metadata }),
     projectId,
-    chains: [sepolia]
+    chains: [mainnet, sepolia]
 })
 
 export function Web3ModalProvider({ children }) {
