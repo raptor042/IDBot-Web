@@ -8,6 +8,7 @@ import Link from "next/link";
 import Profile_ABI from "@/context/Profile.json" assert {type:"json"};
 import { ethers } from "ethers"
 import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/react";
+import { useRouter } from "next/navigation";
 
 export default function AddProject() {
     const [name, setName] = useState()
@@ -31,6 +32,9 @@ export default function AddProject() {
     const [done, setDone] = useState()
     const [idbot_profile, setIDBotProfile] = useState()
     const [profile, setProfile] = useState()
+    const [loading, setLoading] = useState(false)
+
+    const router = useRouter()
 
     const { address, isConnected } = useWeb3ModalAccount()
     const { walletProvider } = useWeb3ModalProvider()
@@ -40,6 +44,9 @@ export default function AddProject() {
     const provider = new ethers.BrowserProvider(walletProvider)
   
     useEffect(() => {
+        const profile = window.localStorage.getItem("profile")
+        setProfile(profile)
+
         const contract = async () => {
             const idbot_profile = new ethers.Contract(
                 profile,
@@ -47,13 +54,19 @@ export default function AddProject() {
                 await provider.getSigner()
             )
 
-            setIDBotProfile(idbot_profile)
+            const status = await idbot_profile.getVerificationStatus()
+            console.log(status)
+
+            if(status == "Not Verified") {
+                router.push("/error/not_verified")
+            } else if(status == "Pending") {
+                router.push("/error/pending")
+            } else {
+                setIDBotProfile(idbot_profile)
+            }
         }
 
         contract()
-
-        const profile = window.localStorage.getItem("profile")
-        setProfile(profile)
     })
 
     const handleSubmit = async () => {
@@ -61,6 +74,7 @@ export default function AddProject() {
             name,
             description,
             ca,
+            chain,
             website,
             telegram,
             twitter,
@@ -80,36 +94,39 @@ export default function AddProject() {
     const handleClick = async e => {
         e.preventDefault()
 
-        if(_name && name) {
-            set_name(false)
-            set_description(true)
-        } else if(_description && description) {
-            set_description(false)
-            set_ca(true)
-        } else if(_ca && ca) {
-            set_ca(false)
-            set_chain(true)
-        } else if(_chain && chain) {
-            set_chain(false)
-            set_website(true)
-        } else if(_website && website) {
-            set_website(false)
-            set_telegram(true)
-        } else if(_telegram && telegram) {
-            set_telegram(false)
-            set_twitter(true)
-        } else if(_twitter && twitter) {
-            set_twitter(false)
-            set_discord(true)
-        } else if(_discord && discord) {
-            set_discord(false)
-            set_linktree(true)
-        } else if(_linktree && linktree) {
-            console.log(address, isConnected)
-            if(address && isConnected) {
-                await handleSubmit()
-            } else {
-                alert("Connect your wallet.")
+        if(!done) {
+            if(_name && name) {
+                set_name(false)
+                set_description(true)
+            } else if(_description && description) {
+                set_description(false)
+                set_ca(true)
+            } else if(_ca && ca) {
+                set_ca(false)
+                set_chain(true)
+            } else if(_chain && chain) {
+                set_chain(false)
+                set_website(true)
+            } else if(_website && website) {
+                set_website(false)
+                set_telegram(true)
+            } else if(_telegram && telegram) {
+                set_telegram(false)
+                set_twitter(true)
+            } else if(_twitter && twitter) {
+                set_twitter(false)
+                set_discord(true)
+            } else if(_discord && discord) {
+                set_discord(false)
+                set_linktree(true)
+            } else if(_linktree && linktree) {
+                console.log(address, isConnected)
+                setLoading(true)
+                if(address && isConnected) {
+                    await handleSubmit()
+                } else {
+                    alert("Connect your wallet.")
+                }
             }
         }
     }
@@ -193,7 +210,13 @@ export default function AddProject() {
             <div id="next" className="my-10 flex flex-row justify-end">
                 <button onClick={handleClick} className="p-4 rounded-lg text-white text-lg font-bold flex bg-black">
                     {!_linktree && !done && <FaArrowRight size={16} color="#fff" className=""/>}
-                    {_linktree && !done && "Submit"}
+                    {_linktree && !done && !loading && "Submit"}
+                    {_linktree && !done && loading && 
+                        <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    }
                     {!_linktree && done && <Link href="/dashboard">Go to Dashboard</Link>}
                 </button>
             </div>

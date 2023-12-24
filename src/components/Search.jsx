@@ -6,12 +6,15 @@ import { IDBot_CA } from "@/context/config";
 import IDBot_ABI from "@/context/IDBot.json" assert {type:"json"};
 import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/react";
 import { ethers } from "ethers";
+import { useRouter } from "next/navigation"
 
 export default function Search() {
     const [profile, setProfile] = useState()
     const [_profile, set_profile] = useState(true)
     const [profile_info, setProfileInfo] = useState(false)
     const [idbot, setIDBot] = useState()
+
+    const router = useRouter()
 
     const { address, isConnected } = useWeb3ModalAccount()
     const { walletProvider } = useWeb3ModalProvider()
@@ -43,6 +46,8 @@ export default function Search() {
         if(isSubscribed) {
             set_profile(false)
             setProfileInfo(true)
+        } else {
+            router.push("/error/not_subscribed")
         }
     }
 

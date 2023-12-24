@@ -8,6 +8,7 @@ import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/rea
 import Profile_ABI from "@/context/Profile.json" assert {type:"json"};
 import { ethers } from "ethers"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export default function Dashboard() {
     const [display, setDisplay] = useState(false)
@@ -41,6 +42,8 @@ export default function Dashboard() {
     const [profile, set_profile] = useState()
     const [profileId, set_profileId] = useState()
 
+    const router = useRouter()
+
     const { address, isConnected } = useWeb3ModalAccount()
     const { walletProvider } = useWeb3ModalProvider()
 
@@ -49,6 +52,12 @@ export default function Dashboard() {
     const provider = new ethers.BrowserProvider(walletProvider)
 
     useEffect(() => {
+        const profile = window.localStorage.getItem("profile")
+        const profileId = window.localStorage.getItem("profileId")
+
+        set_profile(profile)
+        set_profileId(profileId)
+
         const name = async () => {
             const idbot_profile = new ethers.Contract(
                 profile,
@@ -56,28 +65,24 @@ export default function Dashboard() {
                 await provider.getSigner()
             )
 
-            setIDBotProfile(idbot_profile)
+            const status = await idbot_profile.getVerificationStatus()
+            console.log(status)
 
-            const _name = await getName()
+            if(status == "Not Verified") {
+                router.push("/error/not_verified")
+            } else if(status == "Pending") {
+                router.push("/error/pending")
+            } else {
+                setIDBotProfile(idbot_profile)
 
-            setName(_name)
+                const _name = await idbot_profile.getName()
+
+                setName(_name)
+            }
         }
 
         name()
-
-        const profile = window.localStorage.getItem("profile")
-        const profileId = window.localStorage.getItem("profileId")
-
-        set_profile(profile)
-        set_profileId(profileId)
     })
-
-    const getName = async () => {
-        const name = await idbot_profile.getName()
-        console.log(name)
-
-        return name
-    }
 
     const getDescription = async () => {
         const description = await idbot_profile.getDescription()
@@ -220,7 +225,9 @@ export default function Dashboard() {
             set_projects(true)
 
             const projects = await getProjects()
-            setProjects(projects)
+            if(projects.length > 0) {
+                setProjects(projects)
+            }
             setNext(false)
         }
     }
@@ -484,7 +491,7 @@ export default function Dashboard() {
                         <select onChange={e => setCountry(e.target.value)} className="w-full sm:w-1/2 my-2 font-bold text-lg rounded-lg p-2 border-2" style={{ borderColor : "#000" }}>
                             {
                                 projects.map((project, index) => (
-                                    <option key={index} value={project.address}>{`${project.name} - ${project.address} - ${project.score}`}</option>
+                                    <option key={index} value={project[1]}>{`${project[0]} - ${project[2]} - ${Number(project[10])}`}</option>
                                 ))
                             }
                         </select>

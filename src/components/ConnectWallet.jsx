@@ -39,10 +39,7 @@ export default function ConnectWallet() {
         <div id="connect-wallet" className="hidden sm:block">
             <button onClick={() => open()} className="p-4 text-bold text-lg text-white flex rounded-lg bg-black">
                 { isConnected ?
-                    account :
-                    <>
-                        Connect Wallet
-                    </>
+                    account : "Connect Wallet"
                 }
             </button>
         </div>

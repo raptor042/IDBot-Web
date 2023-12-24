@@ -8,9 +8,10 @@ import { store } from "@/store";
 import ID from "../../public/id.jpg"
 import Image from "next/image";
 import Link from "next/link";
-import { IDBot_CA } from "@/context/config";
+import { IDBot_CA, NFT_STORAGE_KEY } from "@/context/config";
 import IDBot_ABI from "@/context/IDBot.json" assert {type:"json"};
 import { ethers } from "ethers"
+import { NFTStorage } from "nft.storage";
 import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/react";
 
 export default function SetUp() {
@@ -40,6 +41,7 @@ export default function SetUp() {
     const [done, setDone] = useState()
     const [idbot, setIDBot] = useState()
     const [loading, setLoading] = useState(false)
+    const [profile, setProfile] = useState()
 
     const { state, dispatch } = useContext(store)
     const { account, camera, profile_url } = state
@@ -55,12 +57,28 @@ export default function SetUp() {
         const _countries = Country.getAllCountries()
         setCountries(_countries)
 
-        const idbot = new ethers.Contract(
-            IDBot_CA,
-            JSON.parse(ABI).abi,
-            provider
-        )
-        setIDBot(idbot)
+        const contract = async () => {
+            const idbot = new ethers.Contract(
+                IDBot_CA,
+                JSON.parse(ABI).abi,
+                await provider.getSigner()
+            )
+            setIDBot(idbot)
+    
+            const profile = localStorage.getItem("profile")
+            const isProfiled = await idbot.isProfiled(address)
+            console.log(isProfiled)
+    
+            if(profile && isProfiled) {
+                setProfile(true)
+                set_name(false)
+                setDone(true)
+            } else {
+                setProfile(false)
+            }
+        }
+
+        contract()
     }, [])
 
     const dataURLToBlob = (dataURL, filename) => {
@@ -91,31 +109,50 @@ export default function SetUp() {
         setId(file)
     }
 
-    const handleSubmit = async () => {
-        const form = new FormData()
-        console.log(form, pic, account)
+    const storeNFTs = async (profile_pic, id) => {
+        const nftstorage = new NFTStorage({ token: NFT_STORAGE_KEY })
+        console.log(profile_pic, id)
 
-        form.append("name", name)
-        form.append("description", description)
-        form.append("email", email)
-        form.append("age", age)
-        form.append("country", country)
-        form.append("state", state_)
-        form.append("phone", phone)
-        form.append("address", address_)
-        form.append("pic", pic)
-        form.append("id", id)
-        form.append("dev", dev)
-        form.append("account", address)
-
-        console.log(form)
-
-        const response = await fetch("https://idbot-80bt.onrender.com/profile", {
-            method : "POST",
-            body : form
+        const profile_nft = await nftstorage.store({
+            image : profile_pic,
+            name : name,
+            description : description
         })
-        const data = await response.json()
-        console.log(data)
+        console.log(profile_nft)
+
+        const id_nft = await nftstorage.store({
+            image : id,
+            name : name,
+            description : description
+        })
+        console.log(id_nft)
+
+        return [profile_nft.url, id_nft.url]
+    }
+
+    const handleSubmit = async () => {
+        const [_profile, _id] = await storeNFTs(pic, id)
+
+        const _phone = `+${country.split(",")[2]} ${phone}`
+        const _country = country.split(",")[0]
+        const rand_num = Math.floor(Math.random() * 1*10**7)
+        console.log(_profile, _id, _phone, _country, rand_num)
+
+        const createProfile = await idbot.createProfile(
+            name,
+            description,
+            dev,
+            email,
+            age,
+            _phone,
+            _country,
+            state_,
+            address_,
+            [_profile, _id],
+            address,
+            Number(rand_num + phone)
+        )
+        console.log(createProfile)
 
         idbot.on("CreateProfile", (profile, owner, profileId, e) => {
             console.log(`A user with public address : ${owner} has created an IDBot profile at ${profile}. Your IDBot profile ID is ${profileId}.`)
@@ -139,60 +176,62 @@ export default function SetUp() {
     const handleClick = async e => {
         e.preventDefault()
 
-        if(_name && name) {
-            set_name(false)
-            set_description(true)
-        } else if(_description && description) {
-            set_description(false)
-            set_email(true)
-        } else if(_email && email) {
-            set_email(false)
-            set_age(true)
-        } else if(_age && age) {
-            set_age(false)
-            set_country(true)
-        } else if(_country && country) {
-            const _states = State.getStatesOfCountry(`${country.split(",")[1]}`)
-            console.log(country.split(","), _states)
-            setStates(_states)
+        if(!done) {
+            if(_name && name) {
+                set_name(false)
+                set_description(true)
+            } else if(_description && description) {
+                set_description(false)
+                set_email(true)
+            } else if(_email && email) {
+                set_email(false)
+                set_age(true)
+            } else if(_age && age) {
+                set_age(false)
+                set_country(true)
+            } else if(_country && country) {
+                const _states = State.getStatesOfCountry(`${country.split(",")[1]}`)
+                console.log(country.split(","), _states)
+                setStates(_states)
 
-            set_country(false)
-            set_state(true)
-        } else if(_state && state_) {
-            set_state(false)
-            set_phone(true)
-        } else if(_phone && phone) {
-            set_phone(false)
-            set_address(true)
-        } else if(_address && address_) {
-            set_address(false)
-            dispatch({
-                type : "Display/Hide Camera",
-                payload : {
-                    camera : true
-                }
-            })
-        } else if(camera && profile_url) {
-            const file = dataURLToBlob(profile_url, "selfie")
-            setPic(file)
+                set_country(false)
+                set_state(true)
+            } else if(_state && state_) {
+                set_state(false)
+                set_phone(true)
+            } else if(_phone && phone) {
+                set_phone(false)
+                set_address(true)
+            } else if(_address && address_) {
+                set_address(false)
+                dispatch({
+                    type : "Display/Hide Camera",
+                    payload : {
+                        camera : true
+                    }
+                })
+            } else if(camera && profile_url) {
+                const file = dataURLToBlob(profile_url, "selfie")
+                setPic(file)
 
-            dispatch({
-                type : "Display/Hide Camera",
-                payload : {
-                    camera : false
+                dispatch({
+                    type : "Display/Hide Camera",
+                    payload : {
+                        camera : false
+                    }
+                })
+                set_id(true)
+            } else if(_id && id) {
+                set_id(false)
+                set_dev(true)
+            } else if(_dev && dev) {
+                setLoading(true)
+                console.log(address, isConnected)
+                if(address && isConnected) {
+                    await handleSubmit()
+                } else {
+                    alert("Connect your wallet.")
                 }
-            })
-            set_id(true)
-        } else if(_id && id) {
-            set_id(false)
-            set_dev(true)
-        } else if(_dev && dev) {
-            setLoading(true)
-            console.log(address, isConnected)
-            if(address && isConnected) {
-                await handleSubmit()
-            } else {
-                alert("Connect your wallet.")
             }
         }
     }
@@ -296,7 +335,10 @@ export default function SetUp() {
                         <div className="flex flex-row justify-center">
                             <Image src={ID} alt="IDentity" className="w-64 h-32"/>
                         </div>
-                        <h1 className="font-bold text-xl my-4" style={{ color : "#000" }}>Congratulations, you have made the first step in your IDBot journey. Your information will be verified in 24 hours.</h1>
+                        <h1 className="font-bold text-xl my-4" style={{ color : "#000" }}>
+                            {profile && "You have already configured an account with IDBot."}
+                            {!profile && "Congratulations, you have made the first step in your IDBot journey. Your information will be verified in 24 hours."}
+                        </h1>
                     </>
                     : null
                 }
@@ -307,7 +349,7 @@ export default function SetUp() {
                     {_dev && !done && !loading && "Submit"}
                     {_dev && !done && loading && 
                         <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                     }

@@ -1,13 +1,11 @@
 "use client"
 
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { FaArrowLeft, FaArrowRight, FaInfoCircle } from "react-icons/fa"
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai"
-import { store } from "@/store"
 import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/react"
 import Profile_ABI from "@/context/Profile.json" assert {type:"json"};
 import { ethers } from "ethers"
-import Link from "next/link"
 
 export default function ProfileInfo({ profile, admin }) {
     const [display, setDisplay] = useState(false)
@@ -34,13 +32,16 @@ export default function ProfileInfo({ profile, admin }) {
     const [_address, set_address] = useState(false)
     const [pic, setPic] = useState()
     const [_pic, set_pic] = useState(false)
+    const [url, setUrl] = useState()
+    const [_url, set_url] = useState(false)
     const [score, setScore] = useState()
     const [_score, set_score] = useState(false)
     const [projects, setProjects] = useState([])
     const [_projects, set_projects] = useState(false)
+    const [verify, setVerify] = useState(false)
     const [idbot_profile, setIDBotProfile] = useState()
-
-    const { state, dispatch } = useContext(store)
+    const [loading, setLoading] = useState(false)
+    const [_loading, set_loading] = useState(false)
 
     const { address, isConnected } = useWeb3ModalAccount()
     const { walletProvider } = useWeb3ModalProvider()
@@ -133,6 +134,13 @@ export default function ProfileInfo({ profile, admin }) {
         return pic
     }
 
+    const getURL = async () => {
+        const url = await idbot_profile.getIdentityUrl()
+        console.log(url)
+
+        return url
+    }
+
     const getScore = async () => {
         const score = await idbot_profile.getReputationScore()
         console.log(Number(ethers.toBigInt(score)))
@@ -142,7 +150,7 @@ export default function ProfileInfo({ profile, admin }) {
 
     const getProjects = async () => {
         const projects = await idbot_profile.getProjects()
-        console.log(projects)
+        console.log(projects, projects.length)
 
         return projects
     }
@@ -215,6 +223,12 @@ export default function ProfileInfo({ profile, admin }) {
             setPic(pic)
         } else if(_pic) {
             set_pic(false)
+            set_url(true)
+
+            const url = await getURL()
+            setUrl(url)
+        } else if(_url) {
+            set_url(false)
             set_score(true)
 
             const score = await getScore()
@@ -224,8 +238,13 @@ export default function ProfileInfo({ profile, admin }) {
             set_projects(true)
 
             const projects = await getProjects()
-            setProjects(projects)
+            if(projects.length > 0) {
+                setProjects(projects)
+            }
+        } else if(_projects) {
             setNext(false)
+            set_projects(false)
+            setVerify(true)
         }
     }
 
@@ -234,12 +253,18 @@ export default function ProfileInfo({ profile, admin }) {
 
         setDisplay(false)
 
-        if(_projects) {
+        if(verify) {
+            setVerify(false)
+            set_projects(true)
+            setNext(true)
+        } else if(_projects) {
             set_projects(false)
             set_score(true)
-            setNext(true)
         } else if(_score) {
             set_score(false)
+            set_url(true)
+        } else if(_url) {
+            set_url(false)
             set_pic(true)
         } else if(_pic) {
             set_pic(false)
@@ -278,23 +303,41 @@ export default function ProfileInfo({ profile, admin }) {
     const handleVerify = async e => {
         e.preventDefault()
 
+        setLoading(true)
+
         const response = await fetch(`https://idbot-80bt.onrender.com/verify/${profile}`, {
             method : "GET",
+            mode : "no-cors"
+        })
+
+        idbot_profile.on("Verified", (owner, e) => {
+            console.log(`User ${owner} has been verified.`)
+            alert("Profile has been verified.")
+            setLoading(false)
         })
     }
 
     const handleUnverify = async e => {
         e.preventDefault()
 
+        set_loading(true)
+
         const response = await fetch(`https://idbot-80bt.onrender.com/unverify/${profile}`, {
             method : "GET",
+            mode : "no-cors"
+        })
+
+        idbot_profile.on("Unverified", (e) => {
+            console.log(`User ${owner} has been unverified.`)
+            alert("Profile has been unverified.")
+            set_loading(false)
         })
     }
 
 
     return (
         <div id="profile-info" className="sm:px-10 my-10">
-        { _profile &&
+            { _profile &&
                 <>
                     <h2 className="text-lg font-bold my-2 flex items-center" style={{ color : "#000" }}>
                         Profile Address
@@ -481,6 +524,23 @@ export default function ProfileInfo({ profile, admin }) {
                     </div>
                 </>
             }
+            { _url && admin &&
+                <>
+                    <h2 className="text-lg font-bold my-2 flex items-center" style={{ color : "#000" }}>
+                        Identity URL
+                        <FaInfoCircle size={16} color="#000" className="ml-3"/>
+                    </h2>
+                    <div className="flex flex-row items-center w-full">
+                        <div className="p-4 bg-gray-100 rounded-lg shadow-inner text-black">
+                            <span className={display ? "blur-none" : "blur"}>{url}</span>
+                        </div>
+                        { display ?
+                            <AiFillEyeInvisible onClick={() => setDisplay(false)} size={24} color="#000" className="ml-3 cursor-pointer"/> :
+                            <AiFillEye onClick={() => setDisplay(true)} size={24} color="#000" className="ml-3 cursor-pointer"/>
+                        }
+                    </div>
+                </>
+            }
             { _score &&
                 <>
                     <h2 className="text-lg font-bold my-2 flex items-center" style={{ color : "#000" }}>
@@ -498,25 +558,37 @@ export default function ProfileInfo({ profile, admin }) {
                     </div>
                 </>
             }
-            {_projects &&
+            { _projects &&
                 <>
                     <h2 className="text-lg font-bold my-2" style={{ color : "#000" }}>Project List</h2>
                     <select onChange={e => setCountry(e.target.value)} className="w-full sm:w-1/2 my-2 font-bold text-lg rounded-lg p-2 border-2" style={{ borderColor : "#000" }}>
                         {
                             projects.map((project, index) => (
-                                <option key={index} value={project.address}>{`${project.name} - ${project.address} - ${project.score}`}</option>
+                                <option key={index} value={project[1]}>{`${project[0]} - ${project[2]} - ${Number(project[10])}`}</option>
                             ))
                         }
                     </select>
                 </>
             }
-            {admin &&
+            { admin && verify &&
                 <div className="flex flex-row items-center justify-around">
                     <button onClick={handleVerify} className="p-4 rounded-lg text-white text-lg font-bold bg-black">
-                        Verify Profile
+                        {!loading && "Verify Profile"}
+                        {loading && 
+                            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        }
                     </button>
                     <button onClick={handleUnverify} className="p-4 rounded-lg text-white text-lg font-bold bg-black">
-                        Remove Verification
+                        {!_loading && "Remove Verification"}
+                        {_loading && 
+                            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        }
                     </button>
                 </div>
             }
