@@ -110,6 +110,11 @@ export default function Admin() {
                 {_profiles && 
                     <div>
                         <h1 className="text-2xl text-black font-bold my-2">Profiles</h1>
+                        {profiles.length <= 0 &&
+                            <div className="flex fles-row w-full h-3/4 mt-10 items-center justify-center">
+                                <h2 className="text-2xl font-bold text-black">No Profiles are registered.</h2>
+                            </div>
+                        }
                         <div className="grid grid-cols-1">
                             {
                                 profiles.map((profile, index) => (
