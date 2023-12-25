@@ -13,7 +13,7 @@ export default function Admin() {
     const [login, setLogin] = useState(true)
     const [profile, setProfile] = useState()
     const [_profile, set_profile] = useState(false)
-    const [profiles, setProfiles] = useState()
+    const [profiles, setProfiles] = useState([])
     const [_profiles, set_profiles] = useState(false)
     const [loading, setLoading] = useState(false)
 
@@ -35,7 +35,9 @@ export default function Admin() {
             const profiles = await idbot.getProfiles()
             console.log(profiles, profiles[0], profiles.length)
 
-            setProfiles(profiles)
+            if(profiles.length > 0) {
+                setProfiles(profiles)
+            }
         }
 
         idbot()
@@ -67,6 +69,7 @@ export default function Admin() {
             set_profiles(true)
         } else {
             alert("You are not an Administrator.")
+            setLoading(false)
         }
     }
 
