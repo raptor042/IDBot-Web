@@ -24,14 +24,14 @@ export default function Camera() {
     const media = async () => {
         const body = document.getElementsByTagName("body")
 
-        const constraints = {
-            video : {
-                width : body.clientWidth < 640 ? 200 : 600,
-                height : body.clientWidth < 640 ? 800 : 300
-            }
-        }
+        // const constraints = {
+        //     video : {
+        //         width : body.clientWidth < 640 ? 200 : 600,
+        //         height : body.clientWidth < 640 ? 800 : 300
+        //     }
+        // }
 
-        const videoStream = await navigator.mediaDevices.getUserMedia(constraints)
+        const videoStream = await navigator.mediaDevices.getUserMedia({ video })
         const video_el = document.querySelector("#video")
         video_el.srcObject = videoStream
         setVideoEl(video_el)
@@ -43,8 +43,8 @@ export default function Camera() {
         const body = document.getElementsByTagName("body")
 
         const canvas_el = document.querySelector("#canvas")
-        canvas_el.width = body.clientWidth < 640 ? 200 : 600,
-        canvas_el.height = body.clientWidth < 640 ? 800 : 300
+        // canvas_el.width = body.clientWidth < 640 ? 200 : 600,
+        // canvas_el.height = body.clientWidth < 640 ? 800 : 300
         canvas_el.getContext("2d").drawImage(video_el, 0, 0)
 
         dispatch({
@@ -66,8 +66,8 @@ export default function Camera() {
 
     return (
         <div id="camera" className="">
-            <video autoPlay id="video" className={video ? "block" : "hidden"}></video>
-            <canvas id="canvas" className={canvas ? "block" : "hidden"}></canvas>
+            <video autoPlay id="video" className={video ? "w-full block" : "hidden"}></video>
+            <canvas id="canvas" className={canvas ? "w-full block" : "hidden"}></canvas>
             <p className="font-bold text-lg text-gray-400">
                 {canvas ?
                     "The Image has been captured. You can proceed."
