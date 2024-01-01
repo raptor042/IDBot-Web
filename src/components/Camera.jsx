@@ -26,8 +26,8 @@ export default function Camera() {
 
         const constraints = {
             video : {
-                width : body.clientWidth < 640 ? 300 : 600,
-                height : body.clientWidth < 640 ? 600 : 300
+                width : body.clientWidth < 640 ? 200 : 600,
+                height : body.clientWidth < 640 ? 800 : 300
             }
         }
 
@@ -43,8 +43,8 @@ export default function Camera() {
         const body = document.getElementsByTagName("body")
 
         const canvas_el = document.querySelector("#canvas")
-        canvas_el.width = body.clientWidth < 640 ? 300 : 600,
-        canvas_el.height = body.clientWidth < 640 ? 600 : 300
+        canvas_el.width = body.clientWidth < 640 ? 200 : 600,
+        canvas_el.height = body.clientWidth < 640 ? 800 : 300
         canvas_el.getContext("2d").drawImage(video_el, 0, 0)
 
         dispatch({
