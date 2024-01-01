@@ -66,8 +66,8 @@ export default function Camera() {
 
     return (
         <div id="camera" className="">
-            <video autoPlay id="video" className={video ? "w-full block" : "hidden"}></video>
-            <canvas id="canvas" className={canvas ? "w-full block" : "hidden"}></canvas>
+            <video autoPlay id="video" className={video ? "w-full h-dvh block" : "hidden"}></video>
+            <canvas id="canvas" className={canvas ? "w-full h-dvh block" : "hidden"}></canvas>
             <p className="font-bold text-lg text-gray-400">
                 {canvas ?
                     "The Image has been captured. You can proceed."
