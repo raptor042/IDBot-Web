@@ -13,6 +13,9 @@ import IDBot_ABI from "@/context/IDBot.json" assert {type:"json"};
 import { ethers } from "ethers"
 import { NFTStorage } from "nft.storage";
 import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/react";
+import { validateAge, validateEmail, validatePhone } from "@/utils/validations";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function SetUp() {
     const [name, setName] = useState()
@@ -36,7 +39,7 @@ export default function SetUp() {
     const [pic, setPic] = useState()
     const [id, setId] = useState()
     const [_id, set_id] = useState()
-    const [dev, setDev] = useState()
+    const [dev, setDev] = useState(true)
     const [_dev, set_dev] = useState()
     const [done, setDone] = useState()
     const [idbot, setIDBot] = useState()
@@ -173,11 +176,21 @@ export default function SetUp() {
                 set_description(false)
                 set_email(true)
             } else if(_email && email) {
-                set_email(false)
-                set_age(true)
+                const validate = validateEmail(email)
+                if(validate) {
+                    set_email(false)
+                    set_age(true)
+                } else {
+                    toast.error("Invalid Email Address.")
+                }
             } else if(_age && age) {
-                set_age(false)
-                set_country(true)
+                const validate = validateAge(age)
+                if(validate) {
+                    set_age(false)
+                    set_country(true)
+                } else {
+                    toast.error("Only ages 18 to 80 are allowed.")
+                }
             } else if(_country && country) {
                 const _states = State.getStatesOfCountry(`${country.split(",")[1]}`)
                 console.log(country.split(","), _states)
@@ -189,8 +202,14 @@ export default function SetUp() {
                 set_state(false)
                 set_phone(true)
             } else if(_phone && phone) {
-                set_phone(false)
-                set_address(true)
+                const _phone = `+${country.split(",")[2]} ${phone}`
+                const validate = validatePhone(_phone)
+                if(validate) {
+                    set_phone(false)
+                    set_address(true)
+                } else {
+                    toast.error("Invalid PhoneNumber.")
+                }
             } else if(_address && address_) {
                 set_address(false)
                 dispatch({
@@ -228,6 +247,7 @@ export default function SetUp() {
     return (
         <>
             <div id="set-up" className="sm:px-10 my-10">
+                <ToastContainer />
                 {_name ? 
                     <>
                         <h2 className="text-lg font-bold my-2" style={{ color : "#000" }}>What is your Full Name?</h2>

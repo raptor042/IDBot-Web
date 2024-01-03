@@ -8,10 +8,13 @@ import IDBot_ABI from "@/context/IDBot.json" assert {type:"json"};
 import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/react";
 import { ethers } from "ethers";
 import { useRouter } from "next/navigation"
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { validateAddress } from "@/utils/validations";
 
 export default function Search() {
     const [profile, setProfile] = useState()
-    const [option, setOption] = useState()
+    const [option, setOption] = useState("Address")
     const [options, setOptions] = useState(true)
     const [_address, setAddress] = useState(false)
     const [number, setNumber] = useState(false)
@@ -62,8 +65,12 @@ export default function Search() {
     const handlePrevious = async e => {
         e.preventDefault()
 
-        if(_address || number) {
+        if(_address) {
             setAddress(false)
+            setPrevious(false)
+            setOptions(true)
+            setNext(true)
+        } else if(number) {
             setNumber(false)
             setPrevious(false)
             setOptions(true)
@@ -98,6 +105,7 @@ export default function Search() {
     return (
         <>
             <div className="sm:px-10 my-10">
+                <ToastContainer />
                 { profile_info && <ProfileInfo profile={profile} admin={false}/> }
                 {options && 
                     <>

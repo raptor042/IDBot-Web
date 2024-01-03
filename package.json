@@ -18,7 +18,8 @@
     "nft.storage": "^7.1.1",
     "react": "^18",
     "react-dom": "^18",
-    "react-icons": "^4.12.0"
+    "react-icons": "^4.12.0",
+    "react-toastify": "^9.1.3"
   },
   "devDependencies": {
     "autoprefixer": "^10.0.1",

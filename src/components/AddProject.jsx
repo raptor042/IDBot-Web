@@ -10,6 +10,9 @@ import { ethers } from "ethers"
 import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/react";
 import { useRouter } from "next/navigation";
 import { IDBot_CA } from "@/context/config";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { validateAddress } from "@/utils/validations";
 
 export default function AddProject() {
     const [name, setName] = useState()
@@ -99,8 +102,13 @@ export default function AddProject() {
                 set_description(false)
                 set_ca(true)
             } else if(_ca && ca) {
-                set_ca(false)
-                set_chain(true)
+                const validate = validateAddress(ca)
+                if(validate) {
+                    set_ca(false)
+                    set_chain(true)
+                } else {
+                    toast.error("Invalid Address.")
+                }
             } else if(_chain && chain) {
                 set_chain(false)
                 set_website(true)
@@ -131,6 +139,7 @@ export default function AddProject() {
     return (
         <>
             <div id="add-project" className="sm:px-10 my-10">
+                <ToastContainer />
                 {_name ? 
                     <>
                         <h2 className="text-lg font-bold my-2" style={{ color : "#000" }}>What is the name of your project?</h2>
