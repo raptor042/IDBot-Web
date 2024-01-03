@@ -1,21 +1,20 @@
 "use client"
 
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { FaArrowLeft, FaArrowRight, FaInfoCircle } from "react-icons/fa"
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai"
-import { store } from "@/store"
 import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/react"
-import Profile_ABI from "@/context/Profile.json" assert {type:"json"};
 import { ethers } from "ethers"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import IDBot_ABI from "@/context/IDBot.json" assert {type:"json"};
+import { IDBot_CA } from "@/context/config"
 
 export default function Dashboard() {
     const [display, setDisplay] = useState(false)
     const [previous, setPrevious] = useState(false)
     const [next, setNext] = useState(true)
-    const [_profile, setProfile] = useState(true)
-    const [_profileId, setProfileId] = useState(false)
+    const [_profileId, setProfileId] = useState(true)
     const [name, setName] = useState()
     const [_name, set_name] = useState(false)
     const [description, setDescription] = useState()
@@ -38,8 +37,7 @@ export default function Dashboard() {
     const [_score, set_score] = useState(false)
     const [projects, setProjects] = useState([])
     const [_projects, set_projects] = useState(false)
-    const [idbot_profile, setIDBotProfile] = useState()
-    const [profile, set_profile] = useState()
+    const [idbot, setIDBot] = useState()
     const [profileId, set_profileId] = useState()
 
     const router = useRouter()
@@ -47,25 +45,23 @@ export default function Dashboard() {
     const { address, isConnected } = useWeb3ModalAccount()
     const { walletProvider } = useWeb3ModalProvider()
 
-    const ABI = JSON.stringify(Profile_ABI)
+    const ABI = JSON.stringify(IDBot_ABI)
 
     const provider = new ethers.BrowserProvider(walletProvider)
 
     useEffect(() => {
-        const profile = window.localStorage.getItem("profile")
         const profileId = window.localStorage.getItem("profileId")
 
-        set_profile(profile)
         set_profileId(profileId)
 
         const name = async () => {
-            const idbot_profile = new ethers.Contract(
-                profile,
+            const idbot = new ethers.Contract(
+                IDBot_CA,
                 JSON.parse(ABI).abi,
                 await provider.getSigner()
             )
 
-            const status = await idbot_profile.getVerificationStatus()
+            const status = await idbot.getVerificationStatus(address)
             console.log(status)
 
             if(status == "Not Verified") {
@@ -73,9 +69,9 @@ export default function Dashboard() {
             } else if(status == "Pending") {
                 router.push("/error/pending")
             } else {
-                setIDBotProfile(idbot_profile)
+                setIDBot(idbot)
 
-                const _name = await idbot_profile.getName()
+                const _name = await idbot.getName(address)
 
                 setName(_name)
             }
@@ -85,70 +81,70 @@ export default function Dashboard() {
     })
 
     const getDescription = async () => {
-        const description = await idbot_profile.getDescription()
+        const description = await idbot.getDescription(address)
         console.log(description)
 
         return description
     }
 
     const getEmail = async () => {
-        const email = await idbot_profile.getEmail()
+        const email = await idbot.getEmail(address)
         console.log(email)
 
         return email
     }
 
     const getAge = async () => {
-        const age = await idbot_profile.getAge()
+        const age = await idbot.getAge(address)
         console.log(age)
 
         return age
     }
 
     const getCountry = async () => {
-        const country = await idbot_profile.getCountry()
+        const country = await idbot.getCountry(address)
         console.log(country)
 
         return country
     }
 
     const getState = async () => {
-        const state = await idbot_profile.getState()
+        const state = await idbot.getState(address)
         console.log(state)
 
         return state
     }
 
     const getPhone = async () => {
-        const phone = await idbot_profile.getPhoneNumber()
+        const phone = await idbot.getPhoneNumber(address)
         console.log(phone)
 
         return phone
     }
 
     const getAddress = async () => {
-        const address = await idbot_profile.getResidentialAddress()
-        console.log(address)
+        const _address = await idbot.getResidentialAddress(address)
+        console.log(_address)
 
-        return address
+        return _address
     }
 
     const getPic = async () => {
-        const pic = await idbot_profile.getProfilePicUrl()
+        const pic = await idbot.getProfilePicUrl(address)
         console.log(pic)
 
         return pic
     }
 
     const getScore = async () => {
-        const score = await idbot_profile.getReputationScore()
+        const score = await idbot.getReputationScore(address)
         console.log(Number(ethers.toBigInt(score)))
 
         return Number(ethers.toBigInt(score))
     }
 
     const getProjects = async () => {
-        const projects = await idbot_profile.getProjects()
+        const projects = await idbot.getProjects(address)
         console.log(projects)
 
         return projects
@@ -159,13 +155,10 @@ export default function Dashboard() {
 
         setDisplay(false)
 
-        if(_profile) {
-            setProfile(false)
-            setProfileId(true)
-            setPrevious(true)
-        } else if(_profileId) {
+        if(_profileId) {
             setProfileId(false)
             set_name(true)
+            setPrevious(true)
         } else if(_name) {
             set_name(false)
             set_description(true)
@@ -271,32 +264,12 @@ export default function Dashboard() {
         } else if(_name) {
             set_name(false)
             setProfileId(true)
-        } else if(_profileId) {
-            setProfileId(false)
-            setProfile(true)
             setPrevious(false)
         }
     }
 
     return (
         <div id="dashboard" className="sm:px-10 my-10">
-        { _profile &&
-                <>
-                    <h2 className="text-lg font-bold my-2 flex items-center" style={{ color : "#000" }}>
-                        Profile Address
-                        <FaInfoCircle size={16} color="#000" className="ml-3"/>
-                    </h2>
-                    <div className="flex flex-row items-center w-full">
-                        <div className="p-4 bg-gray-100 rounded-lg shadow-inner text-black">
-                            <span className={display ? "blur-none" : "blur"}>{profile}</span>
-                        </div>
-                        { display ?
-                            <AiFillEyeInvisible onClick={() => setDisplay(false)} size={24} color="#000" className="ml-3 cursor-pointer"/> :
-                            <AiFillEye onClick={() => setDisplay(true)} size={24} color="#000" className="ml-3 cursor-pointer"/>
-                        }
-                    </div>
-                </>
-            }
             { _profileId &&
                 <>
                     <h2 className="text-lg font-bold my-2 flex items-center" style={{ color : "#000" }}>
@@ -491,7 +464,7 @@ export default function Dashboard() {
                         <select onChange={e => setCountry(e.target.value)} className="w-full sm:w-1/2 my-2 font-bold text-lg rounded-lg p-2 border-2" style={{ borderColor : "#000" }}>
                             {
                                 projects.map((project, index) => (
-                                    <option key={index} value={project[1]}>{`${project[0]} - ${project[2]} - ${Number(project[10])}`}</option>
+                                    <option key={index} value={project[2]}>{`${project[0]} - ${project[2]} - ${Number(project[11])}`}</option>
                                 ))
                             }
                         </select>

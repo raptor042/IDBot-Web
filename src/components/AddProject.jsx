@@ -1,14 +1,15 @@
 "use client"
 
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaArrowRight } from "react-icons/fa";
 import ID from "../../public/id.jpg"
 import Image from "next/image";
 import Link from "next/link";
-import Profile_ABI from "@/context/Profile.json" assert {type:"json"};
+import IDBot_ABI from "@/context/IDBot.json" assert {type:"json"};
 import { ethers } from "ethers"
 import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/react";
 import { useRouter } from "next/navigation";
+import { IDBot_CA } from "@/context/config";
 
 export default function AddProject() {
     const [name, setName] = useState()
@@ -30,8 +31,7 @@ export default function AddProject() {
     const [linktree, setLinktree] = useState()
     const [_linktree, set_linktree] = useState(false)
     const [done, setDone] = useState()
-    const [idbot_profile, setIDBotProfile] = useState()
-    const [profile, setProfile] = useState()
+    const [idbot, setIDBot] = useState()
     const [loading, setLoading] = useState(false)
 
     const router = useRouter()
@@ -39,22 +39,19 @@ export default function AddProject() {
     const { address, isConnected } = useWeb3ModalAccount()
     const { walletProvider } = useWeb3ModalProvider()
 
-    const ABI = JSON.stringify(Profile_ABI)
+    const ABI = JSON.stringify(IDBot_ABI)
 
     const provider = new ethers.BrowserProvider(walletProvider)
   
     useEffect(() => {
-        const profile = window.localStorage.getItem("profile")
-        setProfile(profile)
-
         const contract = async () => {
-            const idbot_profile = new ethers.Contract(
-                profile,
+            const idbot = new ethers.Contract(
+                IDBot_CA,
                 JSON.parse(ABI).abi,
                 await provider.getSigner()
             )
 
-            const status = await idbot_profile.getVerificationStatus()
+            const status = await idbot.getVerificationStatus(address)
             console.log(status)
 
             if(status == "Not Verified") {
@@ -62,7 +59,7 @@ export default function AddProject() {
             } else if(status == "Pending") {
                 router.push("/error/pending")
             } else {
-                setIDBotProfile(idbot_profile)
+                setIDBot(idbot)
             }
         }
 
@@ -70,7 +67,7 @@ export default function AddProject() {
     })
 
     const handleSubmit = async () => {
-        const project = await idbot_profile.addProject(
+        const project = await idbot.addProject(
             name,
             description,
             ca,
@@ -83,8 +80,8 @@ export default function AddProject() {
         )
         console.log(project)
 
-        idbot_profile.on("AddProject", (ca, name, e) => {
-            console.log(`You have added ${name} at ${ca} to your project list.`)
+        idbot.on("AddProject", (contract_address, name, e) => {
+            console.log(`You have added ${name} at ${contract_address} to your project list.`)
         
             set_linktree(false)
             setDone(true)

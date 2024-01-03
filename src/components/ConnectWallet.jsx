@@ -1,8 +1,7 @@
 "use client"
 
-import { store } from "@/store"
 import { useWeb3Modal, useWeb3ModalAccount } from "@web3modal/ethers/react"
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
 export default function ConnectWallet() {
     const { address, isConnected } = useWeb3ModalAccount()
@@ -11,20 +10,11 @@ export default function ConnectWallet() {
 
     const [account, setAccount] = useState()
 
-    const { dispatch } = useContext(store)
-
     useEffect(() => {
         if(isConnected) {
             const _address = truncate(address)
 
             setAccount(_address)
-            
-            dispatch({
-                type : "Set Account",
-                payload : {
-                    account : address
-                }
-            })
         }
     }, [isConnected])
 

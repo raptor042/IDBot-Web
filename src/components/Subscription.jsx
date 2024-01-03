@@ -57,7 +57,7 @@ export default function Subscription() {
             )
             console.log(subscribe)
 
-            idbot.on("Subscribed", (account, duration, e) => {
+            idbot.on("Subscribed", (user, duration, e) => {
                 console.log(`You have subscribed to the IDBot protocol for a duration of ${duration} days.`)
 
                 set_sub(false)

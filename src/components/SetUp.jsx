@@ -44,7 +44,7 @@ export default function SetUp() {
     const [profile, setProfile] = useState()
 
     const { state, dispatch } = useContext(store)
-    const { account, camera, profile_url } = state
+    const { camera, profile_url } = state
 
     const { address, isConnected } = useWeb3ModalAccount()
     const { walletProvider } = useWeb3ModalProvider()
@@ -64,12 +64,11 @@ export default function SetUp() {
                 await provider.getSigner()
             )
             setIDBot(idbot)
-    
-            const profile = localStorage.getItem("profile")
+
             const isProfiled = await idbot.isProfiled(address)
             console.log(isProfiled)
     
-            if(profile && isProfiled) {
+            if(isProfiled) {
                 setProfile(true)
                 set_name(false)
                 setDone(true)
@@ -135,7 +134,7 @@ export default function SetUp() {
 
         const _phone = `+${country.split(",")[2]} ${phone}`
         const _country = country.split(",")[0]
-        const rand_num = Math.floor(Math.random() * 1*10**7)
+        const rand_num = Math.floor(Math.random() * 1*10**5)
         console.log(_profile, _id, _phone, _country, rand_num)
 
         const createProfile = await idbot.createProfile(
@@ -149,26 +148,16 @@ export default function SetUp() {
             state_,
             address_,
             [_profile, _id],
-            address,
             Number(rand_num + phone)
         )
         console.log(createProfile)
 
-        idbot.on("CreateProfile", (profile, owner, profileId, e) => {
-            console.log(`A user with public address : ${owner} has created an IDBot profile at ${profile}. Your IDBot profile ID is ${profileId}.`)
+        idbot.on("CreateProfile", (user, profileId, e) => {
+            console.log(`A user with public address : ${user} has created an IDBot profile. Your IDBot profile ID is ${profileId}.`)
     
             set_dev(false)
             setDone(true)
-    
-            dispatch({
-                type : "Set Profile and ProfileId",
-                payload : {
-                    profile,
-                    profileId
-                }
-            })
-    
-            localStorage.setItem("profile", profile)
+
             localStorage.setItem("profileId", profileId)
         })
     }
