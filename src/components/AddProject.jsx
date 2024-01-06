@@ -70,25 +70,31 @@ export default function AddProject() {
     })
 
     const handleSubmit = async () => {
-        const project = await idbot.addProject(
-            name,
-            description,
-            ca,
-            chain,
-            website,
-            telegram,
-            twitter,
-            discord,
-            linktree
-        )
-        console.log(project)
-
-        idbot.on("AddProject", (contract_address, name, e) => {
-            console.log(`You have added ${name} at ${contract_address} to your project list.`)
-        
-            set_linktree(false)
-            setDone(true)
-        })
+        setLoading(true)
+        try {
+            const project = await idbot.addProject(
+                name,
+                description,
+                ca,
+                chain,
+                website,
+                telegram,
+                twitter,
+                discord,
+                linktree
+            )
+            console.log(project)
+    
+            idbot.on("AddProject", (contract_address, name, e) => {
+                console.log(`You have added ${name} at ${contract_address} to your project list.`)
+            
+                set_linktree(false)
+                setDone(true)
+            })
+        } catch (err) {
+            console.log(err)
+            setLoading(false)
+        }
     }
 
     const handleClick = async e => {
@@ -126,7 +132,6 @@ export default function AddProject() {
                 set_linktree(true)
             } else if(_linktree && linktree) {
                 console.log(address, isConnected)
-                setLoading(true)
                 if(address && isConnected) {
                     await handleSubmit()
                 } else {

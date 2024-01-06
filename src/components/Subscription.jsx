@@ -49,20 +49,25 @@ export default function Subscription() {
 
             console.log(sub.split(","), idbot)
 
-            const subscribe = await idbot.subscribe(
-                Number(sub.split(",")[0]),
-                {
-                    value : ethers.parseEther(`${sub.split(",")[1]}`)
-                }
-            )
-            console.log(subscribe)
-
-            idbot.on("Subscribed", (user, duration, e) => {
-                console.log(`You have subscribed to the IDBot protocol for a duration of ${duration} days.`)
-
-                set_sub(false)
-                setDone(true)
-            })
+            try {
+                const subscribe = await idbot.subscribe(
+                    Number(sub.split(",")[0]),
+                    {
+                        value : ethers.parseEther(`${sub.split(",")[1]}`)
+                    }
+                )
+                console.log(subscribe)
+    
+                idbot.on("Subscribed", (user, duration, e) => {
+                    console.log(`You have subscribed to the IDBot protocol for a duration of ${duration} days.`)
+    
+                    set_sub(false)
+                    setDone(true)
+                })
+            } catch (err) {
+                console.log(err)
+                setLoading(false)
+            }
         }
     }
 
@@ -73,6 +78,7 @@ export default function Subscription() {
                     <>
                         <h2 className="text-lg font-bold my-2" style={{ color : "#000" }}>Select a Subscription</h2>
                         <select onChange={e => setSub(e.target.value)} className="w-full sm:w-1/2 my-2 font-bold text-lg rounded-lg p-4 border-2" style={{ borderColor : "#000" }}>
+                            <option>--</option>
                             <option value={[365, 0.1]}>Yearly - 0.1 ETH</option>
                             <option value={[84, 0.04]}>Quarterly - 0.04 ETH</option>
                             <option value={[28, 0.015]}>Monthly - 0.015 ETH</option>

@@ -547,6 +547,7 @@ export default function ProfileInfo({ profile, admin }) {
                 <>
                     <h2 className="text-lg font-bold my-2" style={{ color : "#000" }}>Project List</h2>
                     <select onChange={e => setCountry(e.target.value)} className="w-full sm:w-1/2 my-2 font-bold text-lg rounded-lg p-2 border-2" style={{ borderColor : "#000" }}>
+                        <option>--</option>
                         {
                             projects.map((project, index) => (
                                 <option key={index} value={project[2]}>{`${project[0]} - ${project[2]} - ${Number(project[11])}`}</option>

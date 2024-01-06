@@ -39,7 +39,7 @@ export default function SetUp() {
     const [pic, setPic] = useState()
     const [id, setId] = useState()
     const [_id, set_id] = useState()
-    const [dev, setDev] = useState(true)
+    const [dev, setDev] = useState()
     const [_dev, set_dev] = useState()
     const [done, setDone] = useState()
     const [idbot, setIDBot] = useState()
@@ -140,29 +140,36 @@ export default function SetUp() {
         const rand_num = Math.floor(Math.random() * 1*10**5)
         console.log(_profile, _id, _phone, _country, rand_num)
 
-        const createProfile = await idbot.createProfile(
-            name,
-            description,
-            dev,
-            email,
-            age,
-            _phone,
-            _country,
-            state_,
-            address_,
-            [_profile, _id],
-            Number(rand_num + phone)
-        )
-        console.log(createProfile)
+        setLoading(true)
 
-        idbot.on("CreateProfile", (user, profileId, e) => {
-            console.log(`A user with public address : ${user} has created an IDBot profile. Your IDBot profile ID is ${profileId}.`)
+        try {
+            const createProfile = await idbot.createProfile(
+                name,
+                description,
+                dev,
+                email,
+                age,
+                _phone,
+                _country,
+                state_,
+                address_,
+                [_profile, _id],
+                Number(rand_num + phone)
+            )
+            console.log(createProfile)
     
-            set_dev(false)
-            setDone(true)
-
-            localStorage.setItem("profileId", profileId)
-        })
+            idbot.on("CreateProfile", (user, profileId, e) => {
+                console.log(`A user with public address : ${user} has created an IDBot profile. Your IDBot profile ID is ${profileId}.`)
+        
+                set_dev(false)
+                setDone(true)
+    
+                localStorage.setItem("profileId", profileId)
+            })
+        } catch (err) {
+            console.log(err)
+            setLoading(false)
+        }
     }
 
     const handleClick = async e => {
@@ -233,7 +240,6 @@ export default function SetUp() {
                 set_id(false)
                 set_dev(true)
             } else if(_dev && dev) {
-                setLoading(true)
                 console.log(address, isConnected)
                 if(address && isConnected) {
                     await handleSubmit()
@@ -280,6 +286,7 @@ export default function SetUp() {
                     <>
                         <h2 className="text-lg font-bold my-2" style={{ color : "#000" }}>Select your Country?</h2>
                         <select onChange={e => setCountry(e.target.value)} className="w-full sm:w-1/2 my-2 font-bold text-lg rounded-lg p-4 border-2" style={{ borderColor : "#000" }}>
+                            <option>--</option>
                             {
                                 countries.map((coun, index) => (
                                     <option key={index} value={[coun.name, coun.isoCode, coun.phonecode, coun.flag]}>{`${coun.flag} ${coun.name}`}</option>
@@ -293,6 +300,7 @@ export default function SetUp() {
                     <>
                         <h2 className="text-lg font-bold my-2" style={{ color : "#000" }}>Select your State?</h2>
                         <select value={state_} onChange={e => setState(e.target.value)} className="w-full sm:w-1/2 my-2 font-bold text-lg rounded-lg p-4 border-2" style={{ borderColor : "#000" }}>
+                            <option>--</option>
                             {
                                 states.map((sat, index) => (
                                     <option key={index} value={sat.name}>{`${country.split(",")[3]} ${sat.name}`}</option>
@@ -333,6 +341,7 @@ export default function SetUp() {
                     <>
                         <h2 className="text-lg font-bold my-2" style={{ color : "#000" }}>Are you are Web2/3 Developer?</h2>
                         <select value={dev} onChange={e => setDev(e.target.value)} className="w-full sm:w-1/2 my-2 font-bold text-lg rounded-lg p-4 border-2" style={{ borderColor : "#000" }}>
+                            <option>--</option>
                             <option value={true}>Yes</option>
                             <option value={false}>No</option>
                         </select>
