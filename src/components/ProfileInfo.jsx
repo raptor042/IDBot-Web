@@ -7,6 +7,7 @@ import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/rea
 import IDBot_ABI from "@/context/IDBot.json" assert {type:"json"};
 import { ethers } from "ethers"
 import { IDBot_CA } from "@/context/config"
+import { decrypt } from "@/utils/crypto"
 
 export default function ProfileInfo({ profile, admin }) {
     const [display, setDisplay] = useState(false)
@@ -70,8 +71,10 @@ export default function ProfileInfo({ profile, admin }) {
     const getName = async () => {
         const name = await idbot.getName(profile)
         console.log(name)
+        const _name = await decrypt(name)
+        console.log(name, _name)
 
-        return name
+        return _name
     }
 
     const getDescription = async () => {
@@ -83,16 +86,18 @@ export default function ProfileInfo({ profile, admin }) {
 
     const getEmail = async () => {
         const email = await idbot.getEmail(profile)
-        console.log(email)
+        const _email = await decrypt(email)
+        console.log(email, _email)
 
-        return email
+        return _email
     }
 
     const getAge = async () => {
         const age = await idbot.getAge(profile)
-        console.log(age)
+        const _age = await decrypt(age)
+        console.log(age, _age)
 
-        return age
+        return _age
     }
 
     const getCountry = async () => {
@@ -111,30 +116,34 @@ export default function ProfileInfo({ profile, admin }) {
 
     const getPhone = async () => {
         const phone = await idbot.getPhoneNumber(profile)
-        console.log(phone)
+        const _phone = await decrypt(phone)
+        console.log(phone, _phone)
 
-        return phone
+        return _phone
     }
 
     const getAddress = async () => {
         const _address = await idbot.getResidentialAddress(profile)
-        console.log(_address)
+        const address_ = await decrypt(_address)
+        console.log(_address, address_)
 
-        return _address
+        return address_
     }
 
     const getPic = async () => {
         const pic = await idbot.getProfilePicUrl(profile)
-        console.log(pic)
+        const _pic = await decrypt(pic)
+        console.log(pic, _pic)
 
-        return pic
+        return _pic
     }
 
     const getURL = async () => {
         const url = await idbot.getIdentityUrl(profile)
-        console.log(url)
+        const _url = await decrypt(url)
+        console.log(url, _url)
 
-        return url
+        return _url
     }
 
     const getScore = async () => {

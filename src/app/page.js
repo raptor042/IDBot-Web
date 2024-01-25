@@ -10,7 +10,8 @@ import QuoteLeft from "@/components/QuoteLeft";
 import QuoteRight from "@/components/QuoteRight";
 import SideBar from "@/components/SideBar";
 import { store } from "@/store";
-import { useContext } from "react";
+import { decrypt, encrypt } from "@/utils/crypto";
+import { useContext, useEffect } from "react";
 import { FaBars } from "react-icons/fa";
 
 export default function HomePage() {

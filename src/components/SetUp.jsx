@@ -16,6 +16,7 @@ import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/rea
 import { validateAge, validateEmail, validatePhone } from "@/utils/validations";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { encrypt } from "@/utils/crypto";
 
 export default function SetUp() {
     const [name, setName] = useState()
@@ -140,20 +141,18 @@ export default function SetUp() {
         const rand_num = Math.floor(Math.random() * 1*10**5)
         console.log(_profile, _id, _phone, _country, rand_num)
 
-        setLoading(true)
-
         try {
             const createProfile = await idbot.createProfile(
-                name,
+                await encrypt(name),
                 description,
                 dev,
-                email,
-                age,
-                _phone,
+                await encrypt(email),
+                await encrypt(age),
+                await encrypt(_phone),
                 _country,
                 state_,
-                address_,
-                [_profile, _id],
+                await encrypt(address_),
+                [await encrypt(_profile), await encrypt(_id)],
                 Number(rand_num + phone)
             )
             console.log(createProfile)
@@ -161,6 +160,7 @@ export default function SetUp() {
             idbot.on("CreateProfile", (user, profileId, e) => {
                 console.log(`A user with public address : ${user} has created an IDBot profile. Your IDBot profile ID is ${profileId}.`)
         
+                setLoading(false)
                 set_dev(false)
                 setDone(true)
     
@@ -242,6 +242,7 @@ export default function SetUp() {
             } else if(_dev && dev) {
                 console.log(address, isConnected)
                 if(address && isConnected) {
+                    setLoading(true)
                     await handleSubmit()
                 } else {
                     alert("Connect your wallet.")
@@ -367,8 +368,8 @@ export default function SetUp() {
                     {_dev && !done && !loading && "Submit"}
                     {_dev && !done && loading && 
                         <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                     }
                     {!_dev && done && <Link href="/dashboard">Go to Dashboard</Link>}

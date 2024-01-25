@@ -9,6 +9,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import IDBot_ABI from "@/context/IDBot.json" assert {type:"json"};
 import { IDBot_CA } from "@/context/config"
+import { decrypt } from "@/utils/crypto"
 
 export default function Dashboard() {
     const [display, setDisplay] = useState(false)
@@ -72,8 +73,9 @@ export default function Dashboard() {
                 setIDBot(idbot)
 
                 const _name = await idbot.getName(address)
+                const name_ = await decrypt(_name)
 
-                setName(_name)
+                setName(name_)
             }
         }
 
@@ -89,16 +91,18 @@ export default function Dashboard() {
 
     const getEmail = async () => {
         const email = await idbot.getEmail(address)
-        console.log(email)
+        const _email = await decrypt(email)
+        console.log(email, _email)
 
-        return email
+        return _email
     }
 
     const getAge = async () => {
         const age = await idbot.getAge(address)
-        console.log(age)
+        const _age = await decrypt(age)
+        console.log(age, _age)
 
-        return age
+        return _age
     }
 
     const getCountry = async () => {
@@ -117,23 +121,26 @@ export default function Dashboard() {
 
     const getPhone = async () => {
         const phone = await idbot.getPhoneNumber(address)
-        console.log(phone)
+        const _phone = await decrypt(phone)
+        console.log(phone, _phone)
 
-        return phone
+        return _phone
     }
 
     const getAddress = async () => {
         const _address = await idbot.getResidentialAddress(address)
-        console.log(_address)
+        const address_ = await decrypt(_address)
+        console.log(_address, address_)
 
-        return _address
+        return address_
     }
 
     const getPic = async () => {
         const pic = await idbot.getProfilePicUrl(address)
-        console.log(pic)
+        const _pic = await decrypt(pic)
+        console.log(pic, _pic)
 
-        return pic
+        return _pic
     }
 
     const getScore = async () => {
